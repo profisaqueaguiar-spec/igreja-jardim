@@ -1,0 +1,182 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body.estilo-cadastro {
+    background: linear-gradient(135deg, #48c9b6 0%, #1a5551 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container-login-cadastro {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    display: flex;
+    max-width: 900px;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Lado Esquerdo - Formulário */
+.form-wrapper {
+    flex: 1;
+    padding: 40px;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.logo-cadastro {
+    max-width: 90px;
+    margin-bottom: 10px;
+}
+
+.form-header h1 {
+    color: #2e8b7d;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.form-header p {
+    color: #666;
+    font-size: 14px;
+}
+
+/* Grupos do Form */
+.form-cadastro {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input,
+.form-group select {
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #2e8b7d;
+    box-shadow: 0 0 8px rgba(46, 139, 125, 0.25);
+}
+
+.form-group input[type="file"] {
+    padding: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Botões */
+.btn-cadastro {
+    margin-top: 10px;
+    padding: 14px;
+    background-color: #2e8b7d;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-cadastro:hover {
+    background-color: #236b60;
+}
+
+.form-footer {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.btn-login {
+    color: #2e8b7d;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn-login:hover {
+    text-decoration: underline;
+}
+
+/* Lado Direito - Painel Decorativo */
+.form-decoracao {
+    flex: 0.9;
+    background: linear-gradient(135deg, #2e8b7d 0%, #1e5c53 100%);
+    color: #ffffff;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.form-decoracao h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.form-decoracao p {
+    font-size: 15px;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+.decoracao-elementos {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.elemento {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+.elemento:nth-child(2) {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .container-login-cadastro {
+        flex-direction: column;
+    }
+
+    .form-decoracao {
+        display: none; /* Esconde o painel decorativo em telemóveis/telas pequenas */
+    }
+}

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Membros - Jardim de Oração</title>
+    <link rel="stylesheet" href="estilo-membros.css">
+    <!-- Ícones via FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="estilo-membros">
+
+    <div class="dashboard-container">
+        <!-- Cabeçalho do Painel -->
+        <header class="header-membros">
+            <div class="header-info">
+                <img src="assets/Logo_site_igreja.png" alt="Logo Igreja" class="logo-painel">
+                <div>
+                    <h1>Membros Cadastrados</h1>
+                    <p>Gestão e consulta da comunidade Jardim de Oração</p>
+                </div>
+            </div>
+            <div class="header-acoes">
+                <a href="cadastro.html" class="btn-novo-membro">
+                    <i class="fa-solid fa-user-plus"></i> Novo Membro
+                </a>
+            </div>
+        </header>
+
+        <!-- Barra de Busca e Métricas Rápidas -->
+        <section class="filtros-container">
+            <div class="busca-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="inputBusca" placeholder="Buscar por nome, cargo ou e-mail..." onkeyup="filtrarMembros()">
+            </div>
+            <div class="contador-membros">
+                Total: <span id="totalMembros">0</span> membros
+            </div>
+        </section>
+
+        <!-- Tabela de Membros -->
+        <main class="tabela-wrapper">
+            <table class="tabela-membros">
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th>Nome</th>
+                        <th>Cargo</th>
+                        <th>Contato</th>
+                        <th>Endereço</th>
+                        <th>Data de Cadastro</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaCorpo">
+                    <!-- Registros inseridos via JavaScript -->
+                    <tr>
+                        <td colspan="6" class="mensagem-carregando">Carregando lista de membros...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <!-- Script de Busca e Renderização Assíncrona -->
+    <script>
+        let todosMembros = [];
+
+        async function carregarMembros() {
+            const tabelaCorpo = document.getElementById('tabelaCorpo');
+            
+            try {
+                const response = await fetch('/api/membros');
+                
+                if (!response.ok) {
+                    throw new Error('Falha ao obter dados do servidor.');
+                }
+
+                todosMembros = await response.json();
+                renderizarTabela(todosMembros);
+
+            } catch (error) {
+                console.error('Erro:', error);
+                tabelaCorpo.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="mensagem-erro">
+                            <i class="fa-solid fa-triangle-exclamation"></i> 
+                            Erro ao carregar a lista de membros. Verifique a conexão com o servidor.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function renderizarTabela(membros) {
+            const tabelaCorpo = document.getElementById('tabelaCorpo');
+            const totalMembrosEl = document.getElementById('totalMembros');
+            
+            totalMembrosEl.textContent = membros.length;
+
+            if (membros.length === 0) {
+                tabelaCorpo.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="mensagem-vazia">Nenhum membro encontrado.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tabelaCorpo.innerHTML = membros.map(membro => {
+                // Se o membro tiver foto cadastrada na pasta /uploads, usa ela; caso contrário, exibe um avatar padrão
+                const fotoUrl = membro.foto ? `/uploads/${membro.foto}` : 'https://via.placeholder.com/50?text=Sem+Foto';
+                
+                const dataFormatada = new Date(membro.data_criacao).toLocaleDateString('pt-BR');
+
+                return `
+                    <tr>
+                        <td class="col-foto">
+                            <img src="${fotoUrl}" alt="${membro.nome}" class="foto-thumb" onerror="this.src='https://via.placeholder.com/50?text=Foto'">
+                        </td>
+                        <td class="col-nome">
+                            <strong>${membro.nome}</strong>
+                        </td>
+                        <td>
+                            <span class="badge-cargo">${membro.cargo}</span>
+                        </td>
+                        <td class="col-contato">
+                            <div><i class="fa-regular fa-envelope"></i> ${membro.email}</div>
+                            <div><i class="fa-solid fa-phone"></i> ${membro.telefone}</div>
+                        </td>
+                        <td>${membro.endereco || 'Não informado'}</td>
+                        <td>${dataFormatada}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filtrarMembros() {
+            const termo = document.getElementById('inputBusca').value.toLowerCase();
+            const membrosFiltrados = todosMembros.filter(membro => 
+                membro.nome.toLowerCase().includes(termo) ||
+                membro.cargo.toLowerCase().includes(termo) ||
+                membro.email.toLowerCase().includes(termo)
+            );
+            renderizarTabela(membrosFiltrados);
+        }
+
+        // Executa a busca ao abrir a página
+        window.addEventListener('DOMContentLoaded', carregarMembros);
+    </script>
+</body>
+</html>
