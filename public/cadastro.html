@@ -95,6 +95,7 @@
                 if (response.ok) {
                     alert('Membro cadastrado com sucesso!');
                     e.target.reset();
+                    window.location.href = 'membros.html';
                 } else {
                     alert('Erro ao cadastrar: ' + result.message);
                 }

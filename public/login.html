@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Jardim de Oração</title>
+    <link rel="stylesheet" href="estilo-cadastro.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="estilo-cadastro">
+    <div class="container-login-cadastro">
+        <div class="form-wrapper">
+            <div class="form-header">
+                <img src="assets/Logo_site_igreja.png" alt="Logo Igreja" class="logo-cadastro">
+                <h1>Painel Administrativo</h1>
+                <p>Faça login para gerenciar os membros</p>
+            </div>
+
+            <form id="formLogin" class="form-cadastro" onsubmit="realizarLogin(event)">
+                <div class="form-group">
+                    <label for="email">E-mail de Acesso</label>
+                    <input type="email" id="email" placeholder="adm@exemplo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="senha">Senha</label>
+                    <div style="position: relative;">
+                        <input type="password" id="senha" placeholder="Sua senha" required style="width: 100%; padding-right: 40px;">
+                        <span onclick="toggleSenha()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #666;">
+                            <i id="iconeOlho" class="fa-solid fa-eye"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-cadastro">Entrar</button>
+            </form>
+        </div>
+
+        <div class="form-decoracao">
+            <h2>Área Restrita</h2>
+            <p>Controle de membros e registros da Igreja Jardim de Oração.</p>
+            <div class="decoracao-elementos">
+                <div class="elemento"></div>
+                <div class="elemento"></div>
+                <div class="elemento"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function realizarLogin(event) {
+            event.preventDefault();
+
+            const emailInput = document.getElementById('email').value.trim();
+            const senhaInput = document.getElementById('senha').value;
+
+            // Credenciais definidas
+            const emailCorreto = 'admjardim@gmail.com';
+            const senhaCorreta = 'deusefiel123';
+
+            if (emailInput === emailCorreto && senhaInput === senhaCorreta) {
+                // Salva um token simples no navegador indicando que está logado
+                localStorage.setItem('isLoggedIn', 'true');
+                alert('Login realizado com sucesso!');
+                window.location.href = 'membros.html';
+            } else {
+                alert('E-mail ou senha incorretos. Tente novamente.');
+            }
+        }
+
+        function toggleSenha() {
+            const inputSenha = document.getElementById('senha');
+            const iconeOlho = document.getElementById('iconeOlho');
+
+            if (inputSenha.type === 'password') {
+                inputSenha.type = 'text';
+                iconeOlho.classList.remove('fa-eye');
+                iconeOlho.classList.add('fa-eye-slash');
+            } else {
+                inputSenha.type = 'password';
+                iconeOlho.classList.remove('fa-eye-slash');
+                iconeOlho.classList.add('fa-eye');
+            }
+        }
+
+    </script>
+</body>
+</html>

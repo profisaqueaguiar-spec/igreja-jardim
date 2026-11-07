@@ -52,6 +52,25 @@ body.estilo-membros {
     font-size: 14px;
 }
 
+.btn-sair {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.btn-sair:hover {
+    background-color: #c9302c;
+}
+
 .btn-novo-membro {
     background-color: #2e8b7d;
     color: #ffffff;
