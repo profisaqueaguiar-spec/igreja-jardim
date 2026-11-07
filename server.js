@@ -62,6 +62,72 @@ app.get('/api/membros', async (req, res) => {
     }
 });
 
+// Rota PUT: Atualizar os dados de um membro pelo ID (com foto opcional)
+app.put('/api/membros/:id', upload.single('foto'), async (req, res) => {
+    const { id } = req.params;
+    const { nome, email, telefone, endereco, cargo } = req.body;
+    const foto = req.file ? req.file.filename : null;
+
+    try {
+        let sql;
+        let values;
+
+        if (foto) {
+            // Se o usuário enviou uma nova foto, atualiza a foto também
+            sql = `
+                UPDATE membros 
+                SET nome = ?, email = ?, telefone = ?, endereco = ?, cargo = ?, foto = ?
+                WHERE id = ?
+            `;
+            values = [nome, email, telefone, endereco, cargo, foto, id];
+        } else {
+            // Se não enviou nova foto, mantém a foto antiga cadastrada
+            sql = `
+                UPDATE membros 
+                SET nome = ?, email = ?, telefone = ?, endereco = ?, cargo = ?
+                WHERE id = ?
+            `;
+            values = [nome, email, telefone, endereco, cargo, id];
+        }
+
+        const [result] = await db.query(sql, values);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Membro não encontrado.' });
+        }
+
+        res.status(200).json({ message: 'Membro atualizado com sucesso!' });
+    } catch (err) {
+        console.error('Erro ao atualizar membro no MySQL:', err);
+        res.status(500).json({ 
+            message: 'Erro ao atualizar dados no banco de dados',
+            error: err.message 
+        });
+    }
+});
+
+// Rota DELETE: Remover um membro pelo ID
+app.delete('/api/membros/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const sql = 'DELETE FROM membros WHERE id = ?';
+        const [result] = await db.query(sql, [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Membro não encontrado.' });
+        }
+
+        res.status(200).json({ message: 'Membro excluído com sucesso!' });
+    } catch (err) {
+        console.error('Erro ao excluir membro no MySQL:', err);
+        res.status(500).json({ 
+            message: 'Erro ao excluir dados no banco de dados',
+            error: err.message 
+        });
+    }
+});
+
 // Inicialização do Servidor
 const PORT = 3000;
 app.listen(PORT, () => {

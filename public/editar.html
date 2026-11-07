@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Membro - Jardim de Oração</title>
+    <link rel="stylesheet" href="estilo-cadastro.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="estilo-cadastro">
+    <div class="container-login-cadastro">
+        <div class="form-wrapper">
+            <div class="form-header">
+                <img src="assets/Logo_site_igreja.png" alt="Logo Igreja" class="logo-cadastro">
+                <h1>Editar Membro</h1>
+                <p>Atualizar dados da comunidade</p>
+            </div>
+
+            <!-- Formulário com suporte a multipart/form-data para envio de foto -->
+            <form id="formEditarMembro" enctype="multipart/form-data" class="form-cadastro" onsubmit="salvarAlteracoes(event)">
+                <div class="form-group">
+                    <label for="txtnome">Nome Completo</label>
+                    <input type="text" id="txtnome" name="nome" placeholder="Digite o nome completo" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtemail">E-mail</label>
+                    <input type="email" id="txtemail" name="email" placeholder="seu.email@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="txttelefone">Telefone / WhatsApp</label>
+                    <input type="tel" id="txttelefone" name="telefone" placeholder="(11) 99999-9999" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtendereco">Endereço</label>
+                    <input type="text" id="txtendereco" name="endereco" placeholder="Rua, número, bairro" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtcargo">Cargo na Igreja</label>
+                    <select id="txtcargo" name="cargo" required>
+                        <option value="">Selecione um cargo</option>
+                        <option value="Membro">Membro</option>
+                        <option value="Diácono / Diaconisa">Diácono / Diaconisa</option>
+                        <option value="Presbítero">Presbítero</option>
+                        <option value="Evangelista">Evangelista</option>
+                        <option value="Pastor / Pastora">Pastor / Pastora</option>
+                        <option value="Líder de Ministério">Líder de Ministério</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="foto">Nova Foto do Membro (Opcional)</label>
+                    <input type="file" id="foto" name="foto" accept="image/*">
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn-cadastro" style="flex: 2;">Salvar Alterações</button>
+                    <a href="membros.html" class="btn-cadastro" style="flex: 1; background: #6c757d; text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center;">Cancelar</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="form-decoracao">
+            <h2>Gestão de Membros</h2>
+            <p>Mantenha os dados e registros da Igreja Jardim de Oração sempre atualizados com segurança e organização.</p>
+            <div class="decoracao-elementos">
+                <div class="elemento"></div>
+                <div class="elemento"></div>
+                <div class="elemento"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Carregamento e Envio -->
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const membroId = urlParams.get('id');
+
+        async function carregarDadosMembro() {
+            if (!membroId) {
+                alert('ID do membro não informado!');
+                window.location.href = 'membros.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/membros');
+                const membros = await response.json();
+                const membro = membros.find(m => m.id == membroId);
+
+                if (membro) {
+                    document.getElementById('txtnome').value = membro.nome || '';
+                    document.getElementById('txtemail').value = membro.email || '';
+                    document.getElementById('txttelefone').value = membro.telefone || '';
+                    document.getElementById('txtendereco').value = membro.endereco || '';
+                    document.getElementById('txtcargo').value = membro.cargo || '';
+                } else {
+                    alert('Membro não encontrado.');
+                    window.location.href = 'membros.html';
+                }
+            } catch (error) {
+                console.error('Erro ao buscar dados:', error);
+            }
+        }
+
+        async function salvarAlteracoes(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+
+            try {
+                const response = await fetch(`/api/membros/${membroId}`, {
+                    method: 'PUT',
+                    body: formData // Envia o formulário completo com texto e arquivo de foto
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Membro atualizado com sucesso!');
+                    window.location.href = 'membros.html';
+                } else {
+                    alert('Erro ao atualizar: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Erro na requisição PUT:', error);
+                alert('Erro de conexão com o servidor.');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', carregarDadosMembro);
+    </script>
+</body>
+</html>

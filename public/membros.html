@@ -50,19 +50,19 @@
                         <th>Contato</th>
                         <th>Endereço</th>
                         <th>Data de Cadastro</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody id="tabelaCorpo">
-                    <!-- Registros inseridos via JavaScript -->
                     <tr>
-                        <td colspan="6" class="mensagem-carregando">Carregando lista de membros...</td>
+                        <td colspan="7" class="mensagem-carregando">Carregando lista de membros...</td>
                     </tr>
                 </tbody>
             </table>
         </main>
     </div>
 
-    <!-- Script de Busca e Renderização Assíncrona -->
+    <!-- Script de Busca, Listagem, Delete e Edição -->
     <script>
         let todosMembros = [];
 
@@ -83,7 +83,7 @@
                 console.error('Erro:', error);
                 tabelaCorpo.innerHTML = `
                     <tr>
-                        <td colspan="6" class="mensagem-erro">
+                        <td colspan="7" class="mensagem-erro">
                             <i class="fa-solid fa-triangle-exclamation"></i> 
                             Erro ao carregar a lista de membros. Verifique a conexão com o servidor.
                         </td>
@@ -101,16 +101,14 @@
             if (membros.length === 0) {
                 tabelaCorpo.innerHTML = `
                     <tr>
-                        <td colspan="6" class="mensagem-vazia">Nenhum membro encontrado.</td>
+                        <td colspan="7" class="mensagem-vazia">Nenhum membro encontrado.</td>
                     </tr>
                 `;
                 return;
             }
 
             tabelaCorpo.innerHTML = membros.map(membro => {
-                // Se o membro tiver foto cadastrada na pasta /uploads, usa ela; caso contrário, exibe um avatar padrão
                 const fotoUrl = membro.foto ? `/uploads/${membro.foto}` : 'https://via.placeholder.com/50?text=Sem+Foto';
-                
                 const dataFormatada = new Date(membro.data_criacao).toLocaleDateString('pt-BR');
 
                 return `
@@ -130,6 +128,14 @@
                         </td>
                         <td>${membro.endereco || 'Não informado'}</td>
                         <td>${dataFormatada}</td>
+                        <td class="col-acoes">
+                            <button onclick="window.location.href='editar.html?id=${membro.id}'" class="btn-acao btn-editar" title="Editar">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="deletarMembro(${membro.id})" class="btn-acao btn-excluir" title="Excluir">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
                     </tr>
                 `;
             }).join('');
@@ -143,6 +149,70 @@
                 membro.email.toLowerCase().includes(termo)
             );
             renderizarTabela(membrosFiltrados);
+        }
+
+        // Função para Excluir Membro (DELETE)
+        async function deletarMembro(id) {
+            if (!confirm('Tem certeza que deseja excluir este membro?')) return;
+
+            try {
+                const response = await fetch(`/api/membros/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message);
+                    carregarMembros(); // Atualiza a tabela
+                } else {
+                    alert('Erro ao excluir: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Erro na requisição DELETE:', error);
+                alert('Erro de conexão com o servidor.');
+            }
+        }
+
+        // Função temporária de Edição via prompt (ou ligada a um Modal futuramente)
+        async function editarMembroPrompt(id, nomeAtual, emailAtual, telefoneAtual, enderecoAtual, cargoAtual) {
+            const novoNome = prompt('Editar Nome:', nomeAtual);
+            if (novoNome === null) return; // Cancelado
+
+            const novoEmail = prompt('Editar E-mail:', emailAtual);
+            const novoTelefone = prompt('Editar Telefone:', telefoneAtual);
+            const novoEndereco = prompt('Editar Endereço:', enderecoAtual);
+            const novoCargo = prompt('Editar Cargo:', cargoAtual);
+
+            const dadosAtualizados = {
+                nome: novoNome,
+                email: novoEmail,
+                telefone: novoTelefone,
+                endereco: novoEndereco,
+                cargo: novoCargo
+            };
+
+            try {
+                const response = await fetch(`/api/membros/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dadosAtualizados)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message);
+                    carregarMembros(); // Atualiza a tabela
+                } else {
+                    alert('Erro ao atualizar: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Erro na requisição PUT:', error);
+                alert('Erro de conexão com o servidor.');
+            }
         }
 
         // Executa a busca ao abrir a página
