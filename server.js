@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ROTA: Cadastrar Membro (Substitui o gravar.jsp)
+// ROTA: Cadastrar Membro
 app.post('/api/membros', upload.single('foto'), async (req, res) => {
     const { nome, email, telefone, endereco, cargo } = req.body;
     const foto = req.file ? req.file.filename : null;
@@ -37,10 +37,9 @@ app.post('/api/membros', upload.single('foto'), async (req, res) => {
     }
 
     try {
-        const sql = `INSERT INTO membros (nome, email, telefone, endereco, cargo, foto) VALUES (?, ?, ?, ?, ?, ?)`;
-        await db.execute(sql, [nome, email, telefone, endereco, cargo, foto]);
+        const sql = `INSERT INTO membros (nome, email, telefone, endereco, cargo, foto) VALUES ($1, $2, $3, $4, $5, $6)`;
+        await db.query(sql, [nome, email, telefone, endereco, cargo, foto]);
         
-        // Retorna sucesso em JSON
         res.status(201).json({ message: 'Membro cadastrado com sucesso!' });
     } catch (error) {
         console.error('Erro ao salvar no banco:', error);
@@ -51,10 +50,10 @@ app.post('/api/membros', upload.single('foto'), async (req, res) => {
 // Rota GET: Listar todos os membros cadastrados
 app.get('/api/membros', async (req, res) => {
     try {
-        const [results] = await db.query('SELECT * FROM membros ORDER BY id DESC');
-        res.status(200).json(results);
+        const result = await db.query('SELECT * FROM membros ORDER BY id DESC');
+        res.status(200).json(result.rows);
     } catch (err) {
-        console.error('Erro ao buscar membros no MySQL:', err);
+        console.error('Erro ao buscar membros no PostgreSQL:', err);
         res.status(500).json({ 
             message: 'Erro ao buscar membros no banco de dados',
             error: err.message 
@@ -73,32 +72,30 @@ app.put('/api/membros/:id', upload.single('foto'), async (req, res) => {
         let values;
 
         if (foto) {
-            // Se o usuário enviou uma nova foto, atualiza a foto também
             sql = `
                 UPDATE membros 
-                SET nome = ?, email = ?, telefone = ?, endereco = ?, cargo = ?, foto = ?
-                WHERE id = ?
+                SET nome = $1, email = $2, telefone = $3, endereco = $4, cargo = $5, foto = $6
+                WHERE id = $7
             `;
             values = [nome, email, telefone, endereco, cargo, foto, id];
         } else {
-            // Se não enviou nova foto, mantém a foto antiga cadastrada
             sql = `
                 UPDATE membros 
-                SET nome = ?, email = ?, telefone = ?, endereco = ?, cargo = ?
-                WHERE id = ?
+                SET nome = $1, email = $2, telefone = $3, endereco = $4, cargo = $5
+                WHERE id = $6
             `;
             values = [nome, email, telefone, endereco, cargo, id];
         }
 
-        const [result] = await db.query(sql, values);
+        const result = await db.query(sql, values);
 
-        if (result.affectedRows === 0) {
+        if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Membro não encontrado.' });
         }
 
         res.status(200).json({ message: 'Membro atualizado com sucesso!' });
     } catch (err) {
-        console.error('Erro ao atualizar membro no MySQL:', err);
+        console.error('Erro ao atualizar membro no PostgreSQL:', err);
         res.status(500).json({ 
             message: 'Erro ao atualizar dados no banco de dados',
             error: err.message 
@@ -111,16 +108,16 @@ app.delete('/api/membros/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const sql = 'DELETE FROM membros WHERE id = ?';
-        const [result] = await db.query(sql, [id]);
+        const sql = 'DELETE FROM membros WHERE id = $1';
+        const result = await db.query(sql, [id]);
 
-        if (result.affectedRows === 0) {
+        if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Membro não encontrado.' });
         }
 
         res.status(200).json({ message: 'Membro excluído com sucesso!' });
     } catch (err) {
-        console.error('Erro ao excluir membro no MySQL:', err);
+        console.error('Erro ao excluir membro no PostgreSQL:', err);
         res.status(500).json({ 
             message: 'Erro ao excluir dados no banco de dados',
             error: err.message 

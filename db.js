@@ -1,14 +1,12 @@
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
+require('dotenv').config(); // Caso utilize variáveis de ambiente (.env)
 
-// Criação da piscina de conexões (Pool)
-const db = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '', // Insira a senha do seu MySQL se houver
-    database: 'igrejajardim',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+// Criação da pool de conexões utilizando a Connection String do Supabase
+const db = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+        rejectUnauthorized: false // Necessário para conexões externas com o Supabase
+    }
 });
 
 module.exports = db;
