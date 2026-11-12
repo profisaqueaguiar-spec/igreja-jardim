@@ -125,8 +125,13 @@ app.delete('/api/membros/:id', async (req, res) => {
     }
 });
 
-// Inicialização do Servidor
-const PORT = 3000;
+// Rota raiz para evitar o erro Cannot GET /
+app.get('/', (req, res) => {
+    res.status(200).json({ message: 'API do Jardim de Oração está a funcionar!' });
+});
+
+// Inicialização do Servidor (Usa a porta do Render ou a 3000 por defeito localmente)
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
