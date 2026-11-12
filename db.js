@@ -6,7 +6,8 @@ const db = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
         rejectUnauthorized: false // Necessário para conexões externas com o Supabase
-    }
+    },
+    family: 4 //Força o uso de IPv4 para evitar o erro ENETUNREACH no Render
 });
 
 module.exports = db;
