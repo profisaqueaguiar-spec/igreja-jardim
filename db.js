@@ -1,13 +1,11 @@
 const { Pool } = require('pg');
-require('dotenv').config(); // Caso utilize variáveis de ambiente (.env)
 
-// Criação da pool de conexões utilizando a Connection String do Supabase
-const db = new Pool({
+const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
-        rejectUnauthorized: false // Necessário para conexões externas com o Supabase
+        rejectUnauthorized: false
     },
-    family: 4 //Força o uso de IPv4 para evitar o erro ENETUNREACH no Render
+    family: 4 // Força o uso de IPv4 para evitar o bloqueio no Render
 });
 
-module.exports = db;
+module.exports = pool;
