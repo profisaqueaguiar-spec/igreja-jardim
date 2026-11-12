@@ -85,7 +85,7 @@
             const formData = new FormData(e.target);
 
             try {
-                const response = await fetch('/api/membros', {
+                const response = await fetch('https://igreja-jardim.onrender.com/api/membros', {
                     method: 'POST',
                     body: formData
                 });
